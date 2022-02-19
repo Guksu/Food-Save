@@ -8,3 +8,93 @@ datasource db {
   url                  = env("DATABASE_URL")
   referentialIntegrity = "prisma"
 }
+
+model User {
+  userId        Int             @id @default(autoincrement())
+  email         String          @unique
+  password      String
+  profileImg    String?
+  alert         Alert[]
+  shareBoard    ShareBoard[]
+  shareLike     ShareLike[]
+  shareComment  ShareComment[]
+  recipeBoard   RecipeBoard[]
+  recipeLike    RecipeLike[]
+  recipeComment RecipeComment[]
+}
+
+model Alert {
+  alertId Int     @id @default(autoincrement())
+  isCheck Boolean @default(true)
+  message String  @db.MediumText
+  user    User    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId  Int
+}
+
+model ShareBoard {
+  shareId      Int            @id @default(autoincrement())
+  category     String
+  name         String
+  like         Int?           @default(0)
+  title        String
+  content      String         @db.MediumText
+  img          String?
+  createAt     DateTime       @default(now())
+  modifyAt     DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId       Int
+  shareLike    ShareLike[]
+  shareComment ShareComment[]
+}
+
+model ShareLike {
+  shareLikeId Int        @id @default(autoincrement())
+  user        User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId      Int
+  shareBoard  ShareBoard @relation(fields: [shareId], references: [shareId], onDelete: Cascade)
+  shareId     Int
+}
+
+model ShareComment {
+  shareCommentId Int        @id @default(autoincrement())
+  comment        String     @db.MediumText
+  createAt       DateTime   @default(now())
+  user           User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId         Int
+  shareBoard     ShareBoard @relation(fields: [shareId], references: [shareId], onDelete: Cascade)
+  shareId        Int
+}
+
+model RecipeBoard {
+  recipeId      Int             @id @default(autoincrement())
+  category      String
+  name          String
+  like          Int?            @default(0)
+  title         String
+  content       String          @db.MediumText
+  img           String?
+  createAt      DateTime        @default(now())
+  modifyAt      DateTime        @updatedAt
+  user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId        Int
+  recipeLike    RecipeLike[]
+  recipeComment RecipeComment[]
+}
+
+model RecipeLike {
+  recipeLikeId Int         @id @default(autoincrement())
+  user         User        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId       Int
+  recipeBoard  RecipeBoard @relation(fields: [recipeId], references: [recipeId], onDelete: Cascade)
+  recipeId     Int
+}
+
+model RecipeComment {
+  recipeCommentId Int         @id @default(autoincrement())
+  comment         String      @db.MediumText
+  createAt        DateTime    @default(now())
+  user            User        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId          Int
+  recipeBoard     RecipeBoard @relation(fields: [recipeId], references: [recipeId], onDelete: Cascade)
+  recipeId        Int
+}
